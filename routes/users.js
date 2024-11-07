@@ -9,3 +9,6 @@ router.post('/api/v1/login', userController.loginUser);
 router.put('/api/v1/update/:id', authMiddleware, upload.single('profilePicture'), userController.updateUser);
 
 module.exports = router;
+
+
+
