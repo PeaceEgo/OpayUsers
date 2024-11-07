@@ -3,16 +3,13 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const userRoutes = require('./routes/users');
 const {PORT, MONGO_URI} = require('./configs/dotenv')
+const express = require('express');
+
 
 const app = express();
 
-const corsOptions = {
-  origin: 'http://127.0.0.1:5500',  
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],  
-};
-
-app.use(cors(corsOptions));  
+// Allow all origins
+app.use(cors());  
 app.use(express.json());
 
 // Root route to handle GET requests to /
