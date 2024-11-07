@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Operations Test</title>
+</head>
+<body>
+    <h1>User Operations Test</h1>
+
+    <h2>Create User</h2>
+    <form id="createUserForm">
+        <input type="email" id="createEmail" placeholder="Email" required><br>
+        <input type="password" id="createPassword" placeholder="Password" required><br>
+        <input type="text" id="createFirstName" placeholder="First Name" required><br>
+        <input type="text" id="createLastName" placeholder="Last Name" required><br>
+        <input type="text" id="createNickName" placeholder="Nick Name"><br>
+        <select id="createGender">
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+        </select><br>
+        <input type="date" id="createDOB" placeholder="Date of Birth" required><br>
+        <input type="text" id="createMobileNumber" placeholder="Mobile Number" required><br>
+        <input type="number" id="createBalance" placeholder="Balance" value="0"><br>
+        <button type="submit">Create User</button>
+    </form>
+
+    <h2>Login User</h2>
+    <form id="loginUserForm">
+        <input type="email" id="loginEmail" placeholder="Email" required><br>
+        <input type="password" id="loginPassword" placeholder="Password" required><br>
+        <button type="submit">Login</button>
+    </form>
+
+    <h2>Update User</h2>
+    <form id="updateUserForm">
+        <input type="text" id="updateUserId" placeholder="User ID" required><br>
+        <input type="text" id="updateFirstName" placeholder="First Name"><br>
+        <input type="text" id="updateLastName" placeholder="Last Name"><br>
+        <input type="text" id="updateNickName" placeholder="Nick Name"><br>
+        <input type="number" id="updateBalance" placeholder="Balance"><br>
+        <button type="submit">Update User</button>
+    </form>
+
+    <script>
+        // Create User
+        document.getElementById('createUserForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const userData = {
+                email: document.getElementById('createEmail').value,
+                password: document.getElementById('createPassword').value,
+                firstName: document.getElementById('createFirstName').value,
+                lastName: document.getElementById('createLastName').value,
+                nickName: document.getElementById('createNickName').value,
+                gender: document.getElementById('createGender').value,
+                dateOfBirth: document.getElementById('createDOB').value,
+                mobileNumber: document.getElementById('createMobileNumber').value,
+                balance: document.getElementById('createBalance').value,
+            };
+
+            fetch('http://localhost:3000/api/v1/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(userData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                console.log(data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+
+        // Login User
+        document.getElementById('loginUserForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const loginData = {
+                email: document.getElementById('loginEmail').value,
+                password: document.getElementById('loginPassword').value,
+            };
+
+            fetch('http://localhost:3000/api/v1/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(loginData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                if (data.token) {
+                    console.log('JWT Token:', data.token);
+                    console.log('User Data:', data.userData);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+
+        // Update User
+        document.getElementById('updateUserForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const userId = document.getElementById('updateUserId').value;
+            const updateData = {
+                firstName: document.getElementById('updateFirstName').value,
+                lastName: document.getElementById('updateLastName').value,
+                nickName: document.getElementById('updateNickName').value,
+                balance: document.getElementById('updateBalance').value,
+            };
+
+            fetch(`http://localhost:3000/api/v1/update/${userId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(updateData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                console.log(data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>
