@@ -9,7 +9,7 @@ const {PORT, MONGO_URI} = require('./configs/dotenv')
 const app = express();
 
 // Allow all origins
-app.use(cors());  
+app.use(cors({ origin: '*' }));
 app.use(express.json());
 
 // Root route to handle GET requests to /
