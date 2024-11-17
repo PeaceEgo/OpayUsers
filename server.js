@@ -27,7 +27,8 @@ mongoose.connect(MONGO_URI)
 .catch(err => console.log('Failed to connect to MongoDB:', err));
 
 // Routes
-app.use(userRoutes);
+// app.use(userRoutes);
+app.use('/api/v1', userRoutes);
 
 // Start server
 app.listen(PORT, () => {
