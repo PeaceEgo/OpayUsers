@@ -1,139 +1,127 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Operations Test</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Endpoints</title>
 </head>
 <body>
-    <h1>User Operations Test</h1>
 
-    <h2>Create User</h2>
-    <form id="createUserForm">
-        <input type="email" id="createEmail" placeholder="Email" required><br>
-        <input type="password" id="createPassword" placeholder="Password" required><br>
-        <input type="text" id="createFirstName" placeholder="First Name" required><br>
-        <input type="text" id="createLastName" placeholder="Last Name" required><br>
-        <input type="text" id="createNickName" placeholder="Nick Name"><br>
-        <select id="createGender">
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-            <option value="Other">Other</option>
-        </select><br>
-        <input type="date" id="createDOB" placeholder="Date of Birth" required><br>
-        <input type="text" id="createMobileNumber" placeholder="Mobile Number" required><br>
-        <input type="number" id="createBalance" placeholder="Balance" value="0"><br>
-        <button type="submit">Create User</button>
-    </form>
+  <h1>Test User Endpoints</h1>
 
-    <h2>Login User</h2>
-    <form id="loginUserForm">
-        <input type="email" id="loginEmail" placeholder="Email" required><br>
-        <input type="password" id="loginPassword" placeholder="Password" required><br>
-        <button type="submit">Login</button>
-    </form>
+  <!-- User Registration Form -->
+  <h2>User Registration</h2>
+  <form id="registerForm">
+    <input type="text" id="registerFirstName" placeholder="First Name" required><br>
+    <input type="text" id="registerLastName" placeholder="Last Name" required><br>
+    <input type="text" id="registerEmail" placeholder="Email" required><br>
+    <input type="password" id="registerPassword" placeholder="Password" required><br>
+    <input type="text" id="registerMobileNumber" placeholder="Mobile Number" required><br>
+    <input type="date" id="registerDateOfBirth" placeholder="Date of Birth" required><br>
+    <button type="submit">Register</button>
+  </form>
 
-    <h2>Update User</h2>
-    <form id="updateUserForm">
-        <input type="text" id="updateUserId" placeholder="User ID" required><br>
-        <input type="text" id="updateFirstName" placeholder="First Name"><br>
-        <input type="text" id="updateLastName" placeholder="Last Name"><br>
-        <input type="text" id="updateNickName" placeholder="Nick Name"><br>
-        <input type="number" id="updateBalance" placeholder="Balance"><br>
-        <button type="submit">Update User</button>
-    </form>
+  <hr>
 
-    <script>
-        // Create User
-        document.getElementById('createUserForm').addEventListener('submit', function(event) {
-            event.preventDefault();
+  <!-- User Login Form -->
+  <h2>User Login</h2>
+  <form id="loginForm">
+    <input type="email" id="loginEmail" placeholder="Email" required><br>
+    <input type="password" id="loginPassword" placeholder="Password" required><br>
+    <button type="submit">Login</button>
+  </form>
 
-            const userData = {
-                email: document.getElementById('createEmail').value,
-                password: document.getElementById('createPassword').value,
-                firstName: document.getElementById('createFirstName').value,
-                lastName: document.getElementById('createLastName').value,
-                nickName: document.getElementById('createNickName').value,
-                gender: document.getElementById('createGender').value,
-                dateOfBirth: document.getElementById('createDOB').value,
-                mobileNumber: document.getElementById('createMobileNumber').value,
-                balance: document.getElementById('createBalance').value,
-            };
+  <hr>
 
-            fetch('https://opayusers-2.onrender.com/api/v1/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(userData)
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert(data.message);
-                console.log(data);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-        });
+  <!-- Set Transaction Pin Form -->
+  <h2>Set Transaction PIN</h2>
+  <form id="setPinForm">
+    <input type="password" id="transactionPin" placeholder="Transaction Pin" required><br>
+    <button type="submit">Set PIN</button>
+  </form>
 
-        // Login User
-        document.getElementById('loginUserForm').addEventListener('submit', function(event) {
-            event.preventDefault();
+  <hr>
 
-            const loginData = {
-                email: document.getElementById('loginEmail').value,
-                password: document.getElementById('loginPassword').value,
-            };
+  <!-- Fetch User by Account Number -->
+  <h2>Fetch User by Account Number</h2>
+  <input type="text" id="accountNumber" placeholder="Enter Account Number (11 digits)" required><br>
+  <button id="fetchUserByAccount">Fetch User</button>
 
-            fetch('https://opayusers-2.onrender.com/api/v1/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(loginData)
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert(data.message);
-                if (data.token) {
-                    console.log('JWT Token:', data.token);
-                    console.log('User Data:', data.userData);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-        });
+  <div id="response"></div>
 
-        // Update User
-        document.getElementById('updateUserForm').addEventListener('submit', function(event) {
-            event.preventDefault();
+  <script>
+    const registerForm = document.getElementById('registerForm');
+    const loginForm = document.getElementById('loginForm');
+    const setPinForm = document.getElementById('setPinForm');
+    const fetchUserBtn = document.getElementById('fetchUserByAccount');
+    const responseDiv = document.getElementById('response');
+    
+    const baseUrl = 'http://localhost:5004/api/v1';
 
-            const userId = document.getElementById('updateUserId').value;
-            const updateData = {
-                firstName: document.getElementById('updateFirstName').value,
-                lastName: document.getElementById('updateLastName').value,
-                nickName: document.getElementById('updateNickName').value,
-                balance: document.getElementById('updateBalance').value,
-            };
+    // User Registration
+    registerForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = {
+        firstName: document.getElementById('registerFirstName').value,
+        lastName: document.getElementById('registerLastName').value,
+        email: document.getElementById('registerEmail').value,
+        password: document.getElementById('registerPassword').value,
+        mobileNumber: document.getElementById('registerMobileNumber').value,
+        dateOfBirth: document.getElementById('registerDateOfBirth').value,
+      };
 
-            fetch(`http://localhost:3000/api/v1/update/${userId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(updateData)
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert(data.message);
-                console.log(data);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-        });
-    </script>
+      const res = await fetch(`${baseUrl}/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      const result = await res.json();
+      responseDiv.innerHTML = JSON.stringify(result, null, 2);
+    });
+
+    // User Login
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = {
+        email: document.getElementById('loginEmail').value,
+        password: document.getElementById('loginPassword').value,
+      };
+
+      const res = await fetch(`${baseUrl}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      const result = await res.json();
+      responseDiv.innerHTML = JSON.stringify(result, null, 2);
+    });
+
+    // Set Transaction Pin
+    setPinForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = {
+        transactionPin: document.getElementById('transactionPin').value,
+      };
+
+      // Assuming you're logged in and have the userId
+      const userId = 'user-id'; // Replace this with dynamic userId from login
+      const res = await fetch(`${baseUrl}/user/${userId}/transaction-pin`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      const result = await res.json();
+      responseDiv.innerHTML = JSON.stringify(result, null, 2);
+    });
+
+    // Fetch User by Account Number
+    fetchUserBtn.addEventListener('click', async () => {
+      const accountNumber = document.getElementById('accountNumber').value;
+      const res = await fetch(`${baseUrl}/user/account/${accountNumber}`);
+      const result = await res.json();
+      responseDiv.innerHTML = JSON.stringify(result, null, 2);
+    });
+  </script>
+
 </body>
 </html>
