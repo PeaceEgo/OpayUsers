@@ -5,7 +5,7 @@ const authMiddleware = require('../middlewares/userAuth');
 const upload = require('../middlewares/uploads');
 
 // User Registration
-router.post('/api/v1/register', userController.createUser);
+router.post('/register', userController.createUser);
 
 // User Login
 router.post('/api/v1/login', userController.loginUser);
