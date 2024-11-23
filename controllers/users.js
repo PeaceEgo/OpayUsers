@@ -31,6 +31,7 @@ const fetchUserByAccountNumber = async (req, res) => {
 
 // Create User
 const createUser = async (req, res) => {
+  console.log(req.body); 
   try {
     const {
       email,
