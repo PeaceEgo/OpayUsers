@@ -3,25 +3,72 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = require('../configs/dotenv');
 
-// Fetch User by Account Number (Triggered on 11th digit)
+// transfer logic
 const fetchUserByAccountNumber = async (req, res) => {
-  const { accountNumber } = req.params;
+  const { accountNumber } = req.params; // Receiver's account number
+  const { senderAccountNumber, amount } = req.body; // Sender's account number and amount for transfer
 
   try {
     if (accountNumber.length !== 11) {
       return res.status(400).json({ message: 'Account number must be 11 digits' });
     }
 
-    const user = await User.findOne({ accountNumber });
-    if (!user) {
-      return res.status(404).json({ message: 'Account number not found' });
+    // Find receiver by account number
+    const receiver = await User.findOne({ accountNumber });
+    if (!receiver) {
+      return res.status(404).json({ message: 'Receiver account number not found' });
     }
 
+    // If transfer data is provided, proceed with the transfer logic
+    if (senderAccountNumber && amount) {
+      // Validate input
+      if (senderAccountNumber.length !== 11 || amount <= 0) {
+        return res.status(400).json({ message: 'Invalid transfer data' });
+      }
+
+      // Find sender by account number
+      const sender = await User.findOne({ accountNumber: senderAccountNumber });
+      if (!sender) {
+        return res.status(404).json({ message: 'Sender account number not found' });
+      }
+
+      // Check sender's balance
+      if (sender.balance < amount) {
+        return res.status(400).json({ message: 'Insufficient funds' });
+      }
+
+      // Perform transfer
+      sender.balance -= amount;
+      receiver.balance += amount;
+
+      // Save updated balances
+      await sender.save();
+      await receiver.save();
+
+      return res.status(200).json({
+        message: 'Transfer successful',
+        transactionDetails: {
+          sender: {
+            accountNumber: sender.accountNumber,
+            name: `${sender.firstName} ${sender.lastName}`,
+            remainingBalance: sender.balance,
+          },
+          receiver: {
+            accountNumber: receiver.accountNumber,
+            name: `${receiver.firstName} ${receiver.lastName}`,
+            updatedBalance: receiver.balance,
+          },
+          amount,
+        },
+      });
+    }
+
+    // If no transfer data is provided, simply return the receiver's details
     res.status(200).json({
       message: 'User fetched successfully',
       recipientDetails: {
-        name: `${user.firstName} ${user.lastName}`,
-        accountNumber: user.accountNumber,
+        name: `${receiver.firstName} ${receiver.lastName}`,
+        accountNumber: receiver.accountNumber,
       },
     });
   } catch (error) {
