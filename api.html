@@ -3,125 +3,58 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Test Endpoints</title>
+  <title>Profile Picture Upload</title>
 </head>
 <body>
+  <h1>Test Profile Picture Upload</h1>
 
-  <h1>Test User Endpoints</h1>
-
-  <!-- User Registration Form -->
-  <h2>User Registration</h2>
-  <form id="registerForm">
-    <input type="text" id="registerFirstName" placeholder="First Name" required><br>
-    <input type="text" id="registerLastName" placeholder="Last Name" required><br>
-    <input type="text" id="registerEmail" placeholder="Email" required><br>
-    <input type="password" id="registerPassword" placeholder="Password" required><br>
-    <input type="text" id="registerMobileNumber" placeholder="Mobile Number" required><br>
-    <input type="date" id="registerDateOfBirth" placeholder="Date of Birth" required><br>
-    <button type="submit">Register</button>
+  <!-- Upload Form -->
+  <form id="uploadForm">
+    <label for="fileInput">Select a profile picture:</label><br><br>
+    <input type="file" id="fileInput" name="profilePicture" accept="image/*" required><br><br>
+    <button type="submit">Upload</button>
   </form>
 
-  <hr>
-
-  <!-- User Login Form -->
-  <h2>User Login</h2>
-  <form id="loginForm">
-    <input type="email" id="loginEmail" placeholder="Email" required><br>
-    <input type="password" id="loginPassword" placeholder="Password" required><br>
-    <button type="submit">Login</button>
-  </form>
-
-  <hr>
-
-  <!-- Set Transaction Pin Form -->
-  <h2>Set Transaction PIN</h2>
-  <form id="setPinForm">
-    <input type="password" id="transactionPin" placeholder="Transaction Pin" required><br>
-    <button type="submit">Set PIN</button>
-  </form>
-
-  <hr>
-
-  <!-- Fetch User by Account Number -->
-  <h2>Fetch User by Account Number</h2>
-  <input type="text" id="accountNumber" placeholder="Enter Account Number (11 digits)" required><br>
-  <button id="fetchUserByAccount">Fetch User</button>
-
-  <div id="response"></div>
+  <!-- Output Section -->
+  <h3>Response:</h3>
+  <pre id="response"></pre>
 
   <script>
-    const registerForm = document.getElementById('registerForm');
-    const loginForm = document.getElementById('loginForm');
-    const setPinForm = document.getElementById('setPinForm');
-    const fetchUserBtn = document.getElementById('fetchUserByAccount');
-    const responseDiv = document.getElementById('response');
-    
-    const baseUrl = 'http://localhost:5004/api/v1';
+    const uploadForm = document.getElementById('uploadForm');
+    const responseBox = document.getElementById('response');
 
-    // User Registration
-    registerForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const data = {
-        firstName: document.getElementById('registerFirstName').value,
-        lastName: document.getElementById('registerLastName').value,
-        email: document.getElementById('registerEmail').value,
-        password: document.getElementById('registerPassword').value,
-        mobileNumber: document.getElementById('registerMobileNumber').value,
-        dateOfBirth: document.getElementById('registerDateOfBirth').value,
-      };
+    uploadForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
 
-      const res = await fetch(`${baseUrl}/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-      const result = await res.json();
-      responseDiv.innerHTML = JSON.stringify(result, null, 2);
-    });
+      const fileInput = document.getElementById('fileInput');
+      if (!fileInput.files.length) {
+        alert("Please select a file before uploading.");
+        return;
+      }
 
-    // User Login
-    loginForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const data = {
-        email: document.getElementById('loginEmail').value,
-        password: document.getElementById('loginPassword').value,
-      };
+      const formData = new FormData();
+      formData.append('profilePicture', fileInput.files[0]);
 
-      const res = await fetch(`${baseUrl}/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-      const result = await res.json();
-      responseDiv.innerHTML = JSON.stringify(result, null, 2);
-    });
+      try {
+        const response = await fetch('http://localhost:5000/api/v1/update/67449b4b4f772392ad15a483', {
 
-    // Set Transaction Pin
-    setPinForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const data = {
-        transactionPin: document.getElementById('transactionPin').value,
-      };
+          method: 'PATCH',
+          body: formData,
+        });
 
-      // Assuming you're logged in and have the userId
-      const userId = 'user-id'; // Replace this with dynamic userId from login
-      const res = await fetch(`${baseUrl}/user/${userId}/transaction-pin`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-      const result = await res.json();
-      responseDiv.innerHTML = JSON.stringify(result, null, 2);
-    });
+        const result = await response.json();
+        responseBox.textContent = JSON.stringify(result, null, 2);
 
-    // Fetch User by Account Number
-    fetchUserBtn.addEventListener('click', async () => {
-      const accountNumber = document.getElementById('accountNumber').value;
-      const res = await fetch(`${baseUrl}/user/account/${accountNumber}`);
-      const result = await res.json();
-      responseDiv.innerHTML = JSON.stringify(result, null, 2);
+        if (response.ok) {
+          alert('File uploaded successfully!');
+        } else {
+          alert('File upload failed: ' + result.message);
+        }
+      } catch (error) {
+        console.error('Error uploading file:', error);
+        responseBox.textContent = 'Error: ' + error.message;
+      }
     });
   </script>
-
 </body>
 </html>
