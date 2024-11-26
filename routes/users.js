@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/users');
 const authMiddleware = require('../middlewares/userAuth');
-const upload = require('../middlewares/uploads');
+const upload = require('../middlewares/multerConfig');
 
 // User Registration
 router.post('/api/v1/register', userController.createUser);
@@ -11,7 +11,7 @@ router.post('/api/v1/register', userController.createUser);
 router.post('/api/v1/login', userController.loginUser);
 
 // Update User 
-router.put('/api/v1/update/:id', authMiddleware, upload.single('profilePicture'), userController.updateUser);
+router.patch('/api/v1/update/:userId', upload.single('profilePicture'), userController.updateUser);
 
 // Fetch User by ID
 router.get('/api/v1/user/:userId', authMiddleware, userController.getUser);

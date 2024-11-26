@@ -43,13 +43,19 @@ const userSchema = new mongoose.Schema({
     gender: { type: String, enum: ['Male', 'Female', 'Other'], required: true },
     dateOfBirth: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    userId: { type: mongoose.Schema.Types.ObjectId, required: true, auto: true },
+    userId: { type: mongoose.Schema.Types.ObjectId, unique: true }, // Must match _id
     balance: { type: Number, default: 0 },
     accountNumber: { type: String, required: true, unique: true },
     transactionPin: { type: String, default: '0' },
     transactions: { type: [transactionSchema], default: [] },
     password: { type: String, required: true, minlength: [6, 'Password must be at least 6 characters long'] },
     profilePicture: { type: String, default: '' }  // Profile picture field, initially empty
+});
+
+// Middleware to sync userId with _id
+userSchema.pre('save', function(next) {
+    this.userId = this._id; // Explicitly set userId to match _id
+    next();
 });
 
 // Hash the transaction PIN before saving it

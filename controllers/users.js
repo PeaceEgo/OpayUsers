@@ -2,6 +2,10 @@ const User = require('../models/userModel');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = require('../configs/dotenv');
+const { uploadToDropbox } = require('../services/dropboxService');
+const fs = require('fs');
+const path = require('path');
+
 
 // transfer logic
 const fetchUserByAccountNumber = async (req, res) => {
@@ -170,22 +174,38 @@ const setTransactionPin = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
-// Update User
+// update User Profile
 const updateUser = async (req, res) => {
   const { userId } = req.params;
-  const updateData = { ...req.body };
 
   try {
+    const updateData = { ...req.body };
+
+    if (req.file) {
+      // Define a unique Dropbox path
+      const dropboxPath = `/profile_pictures/${Date.now()}-${req.file.filename}`;
+
+      // Upload file to Dropbox
+      const dropboxUrl = await uploadToDropbox(req.file.path, dropboxPath);
+
+      // Add Dropbox URL to update data
+      updateData.profilePicture = dropboxUrl;
+
+      // Remove the file from local storage after upload
+      fs.unlinkSync(req.file.path);
+    }
+
     const user = await User.findByIdAndUpdate(userId, updateData, { new: true });
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
+
     res.status(200).json({ message: 'User updated successfully', user });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
+
 
 // Login User and generate JWT token
 const loginUser = async (req, res) => {

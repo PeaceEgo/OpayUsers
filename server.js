@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const userRoutes = require('./routes/users');
-const {PORT, MONGO_URI} = require('./configs/dotenv')
+const {PORT, MONGO_URI} = require('./configs/dotenv');
 
 
 
@@ -15,6 +15,8 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
+
+
 
 // Root route to handle GET requests to /
 app.get('/', (req, res) => {
