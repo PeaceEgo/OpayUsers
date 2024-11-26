@@ -174,6 +174,8 @@ const setTransactionPin = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+
 // update User Profile
 const updateUser = async (req, res) => {
   const { userId } = req.params;
@@ -182,24 +184,23 @@ const updateUser = async (req, res) => {
     const updateData = { ...req.body };
 
     if (req.file) {
-      // Define a unique Dropbox path
-      const dropboxPath = `/profile_pictures/${Date.now()}-${req.file.filename}`;
+      // Generate a unique Dropbox path using a timestamp and original filename
+      const dropboxPath = `/profile_pictures/${Date.now()}-${req.file.originalname}`;
 
-      // Upload file to Dropbox
-      const dropboxUrl = await uploadToDropbox(req.file.path, dropboxPath);
+      // Upload file directly to Dropbox (no need to save locally)
+      const dropboxUrl = await uploadToDropbox(req.file.buffer, dropboxPath);
 
       // Add Dropbox URL to update data
       updateData.profilePicture = dropboxUrl;
-
-      // Remove the file from local storage after upload
-      fs.unlinkSync(req.file.path);
     }
 
+    // Update user data in database
     const user = await User.findByIdAndUpdate(userId, updateData, { new: true });
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
+    // Respond with updated user data
     res.status(200).json({ message: 'User updated successfully', user });
   } catch (error) {
     res.status(500).json({ error: error.message });
