@@ -17,7 +17,9 @@ router.patch('/api/v1/update/:userId', upload.single('profilePicture'), userCont
 router.get('/api/v1/user/:userId', authMiddleware, userController.getUser);
 
 // Fetch User by Account Number 
-router.get('/api/v1/user/account/:accountNumber',authMiddleware, userController.fetchUserByAccountNumber);
+router.get('/api/v1/user/account/:accountNumber', userController.fetchUserByAccountNumber);
+
+router.post('/api/v1/user/account/:accountNumber', userController.fetchUserByAccountNumber);
 
 // Set Transaction PIN 
 router.patch('/api/v1/user/:userId/transaction-pin', authMiddleware, userController.setTransactionPin);
