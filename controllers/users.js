@@ -58,6 +58,7 @@ const fetchUserByAccountNumber = async (req, res) => {
             remainingBalance: sender.balance,
           },
           receiver: {
+            message: 'Transfer successful',
             accountNumber: receiver.accountNumber,
             name: `${receiver.firstName} ${receiver.lastName}`,
             updatedBalance: receiver.balance,
