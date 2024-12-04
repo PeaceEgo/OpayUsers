@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
-// Define the schema for each transaction
+// schema for each transaction
 const transactionSchema = new mongoose.Schema({
     transactionType: {
         type: String,
@@ -34,7 +34,7 @@ const transactionSchema = new mongoose.Schema({
     }
 });
 
-// Define the main user schema
+//  main user schema
 const userSchema = new mongoose.Schema({
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
@@ -54,7 +54,7 @@ const userSchema = new mongoose.Schema({
 
 // Middleware to sync userId with _id
 userSchema.pre('save', function(next) {
-    this.userId = this._id; // Explicitly set userId to match _id
+    this.userId = this._id; 
     next();
 });
 
